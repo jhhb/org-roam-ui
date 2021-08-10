@@ -35,3 +35,6 @@ yarn-error.log*
 #logs
 
 /.log/
+
+# JetBrains local project config
+.idea

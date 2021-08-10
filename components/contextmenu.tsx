@@ -42,7 +42,7 @@ import {
   PlusSquareIcon,
 } from '@chakra-ui/icons'
 
-import { OrgRoamGraphReponse, OrgRoamLink, OrgRoamNode } from '../api'
+import { OrgRoamNode } from '../api'
 
 export default interface ContextMenuProps {
   background: Boolean
