@@ -15,7 +15,7 @@ import type {
   ForceGraph2D as TForceGraph2D,
   ForceGraph3D as TForceGraph3D,
 } from 'react-force-graph'
-import { OrgRoamGraphReponse, OrgRoamLink, OrgRoamNode } from '../api'
+import { OrgRoamGraphResponse, OrgRoamLink, OrgRoamNode } from '../api'
 import { GraphData, NodeObject, LinkObject } from 'force-graph'
 
 import { useWindowSize } from '@react-hook/window-size'
@@ -92,9 +92,10 @@ export function GraphPage() {
 
   const currentGraphDataRef = useRef<GraphData>({ nodes: [], links: [] })
 
-  const updateGraphData = (orgRoamGraphData: OrgRoamGraphReponse) => {
+  const updateGraphData = (response: OrgRoamGraphResponse) => {
+    const orgRoamGraphData = sanitizeResponse(response)
     const oldNodeById = nodeByIdRef.current
-    tagsRef.current = orgRoamGraphData.tags ?? []
+    tagsRef.current = orgRoamGraphData.tags
     const nodesByFile = orgRoamGraphData.nodes.reduce<NodesByFile>((acc, node) => {
       return {
         ...acc,
@@ -1184,4 +1185,12 @@ function hexToRGBA(hex: string, opacity: number) {
       .join(',') +
     ')'
   )
+}
+
+function sanitizeResponse(response: OrgRoamGraphResponse) {
+  return {
+    nodes: response.nodes || [],
+    tags: response.tags || [],
+    links: response.links || [],
+  }
 }
