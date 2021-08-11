@@ -318,7 +318,7 @@ unchanged."
          (response `((nodes . ,(mapcar (apply-partially #'org-roam-ui-sql-to-alist (append nodes-names nil)) nodes-db-rows))
                                   (links . ,(mapcar (apply-partially #'org-roam-ui-sql-to-alist '(source target type)) links-db-rows))
                                   (tags . ,(seq-mapcat #'seq-reverse (org-roam-db-query [:select :distinct tag :from tags]))))))
-    (websocket-send-text oru-ws (json-encode `((type . "graphdata") (data . ,response))))))
+    (websocket-send-text oru-ws (org-roam-ui--encode-response response))))
 
 
 (defun org-roam-ui--update-current-node ()
@@ -331,6 +331,18 @@ unchanged."
                                                  (data . ((commandName . "follow")
                                                          (id . ,node))))))))))
 
+(defun org-roam-ui--encode-response (response)
+  "Encode the RESPONSE alist, ensuring that each value is either
+the given value, OR an empty array, so that the org-roam-ui
+frontend client can assume non-null values."
+  (let* ((empty-array '[])
+	(nil-guarded-response
+	 (mapcar #'(lambda (node-or-link-or-tag)
+		     (if (eq (length node-or-link-or-tag) 1)
+			 `(,@node-or-link-or-tag . ,empty-array)
+		       node-or-link-or-tag))
+		 response)))
+    (json-encode `((type . "graphdata") (data . ,nil-guarded-response)))))
 
 (defun org-roam-ui--update-theme ()
   "Send the current theme data to the websocket."
